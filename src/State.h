@@ -10,8 +10,10 @@
 
 /////////////////////////////////////////////////////////////////
 
-typedef void (*CallbackFunction)();
-typedef bool (*GuardCondition)();
+//typedef void (*CallbackFunction)();
+typedef std::function<void(void *context)> CallbackFunction;
+//typedef bool (*GuardCondition)();
+typedef std::function<bool(void *context)> GuardCondition;
 
 /////////////////////////////////////////////////////////////////
 

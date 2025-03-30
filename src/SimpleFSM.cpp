@@ -5,7 +5,7 @@
 #include "Transitions.h"
 /////////////////////////////////////////////////////////////////
 
-SimpleFSM::SimpleFSM() {
+SimpleFSM::SimpleFSM(): _context(nullptr) {
 }
 
 /////////////////////////////////////////////////////////////////
@@ -287,9 +287,9 @@ void SimpleFSM::run(int interval /* = 1000 */, CallbackFunction tick_cb /* = NUL
   // go through the timed events
   _handleTimedEvents(now);
   // trigger the on_state event
-  if (current_state->on_state != NULL) current_state->on_state();
+  if (current_state->on_state != NULL) current_state->on_state(_context);
   // trigger the regular tick event
-  if (tick_cb != NULL) tick_cb();
+  if (tick_cb != NULL) tick_cb(_context);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -340,12 +340,12 @@ bool SimpleFSM::_changeToState(State* s, unsigned long now) {
   // set the new state
   prev_state = current_state;
   current_state = s;
-  if (s->on_enter != NULL) s->on_enter();
+  if (s->on_enter != NULL) s->on_enter(_context);
   // save the time
   last_run = now;
   last_transition = now;
   // is this the end?
-  if (s->is_final && finished_cb != NULL) finished_cb();
+  if (s->is_final && finished_cb != NULL) finished_cb(_context);
   if (s->is_final) is_finished = true;
   return true;
 }
@@ -365,11 +365,11 @@ bool SimpleFSM::_transitionTo(AbstractTransition* transition) {
   // empty parameter?
   if (transition->to == NULL) return false;
   // can I pass the guard
-  if (transition->guard_cb != NULL && !transition->guard_cb()) return false;
+  if (transition->guard_cb != NULL && !transition->guard_cb(_context)) return false;
   // trigger events
-  if (transition->from->on_exit != NULL) transition->from->on_exit();
-  if (transition->on_run_cb != NULL) transition->on_run_cb();
-  if (on_transition_cb != NULL) on_transition_cb();
+  if (transition->from->on_exit != NULL) transition->from->on_exit(_context);
+  if (transition->on_run_cb != NULL) transition->on_run_cb(_context);
+  if (on_transition_cb != NULL) on_transition_cb(_context);
   return _changeToState(transition->to, millis());
 }
 

@@ -15,8 +15,10 @@
 
 /////////////////////////////////////////////////////////////////
 
-typedef void (*CallbackFunction)();
-typedef bool (*GuardCondition)();
+//typedef void (*CallbackFunction)();
+typedef std::function<void(void *context)> CallbackFunction;
+//typedef bool (*GuardCondition)();
+typedef std::function<bool(void *context)> GuardCondition;
 
 /////////////////////////////////////////////////////////////////
 
@@ -47,6 +49,8 @@ class SimpleFSM {
   unsigned long lastTransitioned() const;
   String getDotDefinition();
 
+  void setContext(void *context) { _context = context;}
+
  protected:
   int num_timed = 0;
   int num_standard = 0;
@@ -65,6 +69,8 @@ class SimpleFSM {
   CallbackFunction finished_cb = NULL;
 
   String dot_definition = "";
+
+  void *_context;
 
   bool _isDuplicate(const TimedTransition& transition, const TimedTransition* transitionArray, int arraySize) const;
   bool _isDuplicate(const Transition& transition, const Transition* transitionArray, int arraySize) const;
